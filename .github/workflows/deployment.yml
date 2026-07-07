@@ -44,12 +44,12 @@ jobs:
       # ==========================================
       - name: Initialize Main Infrastructure Backend
         run: terraform init
-        working-directory: ./infrastructure
+        working-directory: ./infra
 
       - name: Deploy Cluster Resources to AWS
         if: github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: ./infrastructure
+        working-directory: ./infra
 
       # ==========================================
       # OPTIONAL STAGE 3: DESTROY CLEANUP
@@ -59,7 +59,7 @@ jobs:
         run: |
           terraform destroy -auto-approve
           echo "Main infrastructure removed. Now cleaning up bootstrap bucket..."
-        working-directory: ./infrastructure
+        working-directory: ./infra
 
       # Optional safety step: If tearing everything down via manual button, remove the bucket too
       - name: Destroy Bootstrap Storage
