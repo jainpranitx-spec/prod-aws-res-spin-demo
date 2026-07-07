@@ -12,14 +12,13 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-resource "aws_s3_bucket" "state_bucket" {
-  bucket        = "prod-aws-tf-state-save"
-  force_destroy = false
+resource "random_string" "bucket_suffix" {
+  length  = 6
+  special = false
+  upper   = false
 }
 
-resource "aws_s3_bucket_versioning" "state_versioning" {
-  bucket = aws_s3_bucket.state_bucket.id
-  versioning_configuration {
-    status = "Enabled"
-  }
+resource "aws_s3_bucket" "state_bucket" {
+  # Result will be something like: prod-aws-tf-state-save-x4b7df
+  bucket = "prod-aws-tf-state-save-${random_string.bucket_suffix.result}" 
 }
