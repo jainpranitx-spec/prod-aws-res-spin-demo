@@ -22,3 +22,8 @@ resource "aws_s3_bucket" "state_bucket" {
   # Result will be something like: prod-aws-tf-state-save-x4b7df
   bucket = "prod-aws-tf-state-save-${random_string.bucket_suffix.result}" 
 }
+
+output "s3_bucket_name" {
+  value       = aws_s3_bucket.state_bucket.id
+  description = "The dynamic name of the generated S3 backend bucket"
+}

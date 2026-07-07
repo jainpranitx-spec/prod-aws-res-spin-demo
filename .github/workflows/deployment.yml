@@ -39,11 +39,20 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: ./bootstrap
 
+      # 🛠️ NEW STEP: Capture the dynamic bucket name output from Stage 1
+      - name: Capture S3 Bucket Name
+        id: get_bucket
+        run: |
+          BUCKET=$(terraform output -raw s3_bucket_name)
+          echo "DYNAMIC_BUCKET=$BUCKET" >> $GITHUB_ENV
+        working-directory: ./bootstrap
+
       # ==========================================
       # STAGE 2: MAIN INFRASTRUCTURE (EC2 & VPC)
       # ==========================================
+      # 🛠️ UPDATED STEP: Injecting the dynamic bucket name directly into the backend init
       - name: Initialize Main Infrastructure Backend
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ env.DYNAMIC_BUCKET }}"
         working-directory: ./infra
 
       - name: Deploy Cluster Resources to AWS
@@ -54,6 +63,12 @@ jobs:
       # ==========================================
       # OPTIONAL STAGE 3: DESTROY CLEANUP
       # ==========================================
+      # 🛠️ UPDATED STEP: Destroys need init backend-config too to know where the state is!
+      - name: Initialize Backend for Destroy
+        if: github.event_name == 'workflow_dispatch'
+        run: terraform init -backend-config="bucket=${{ env.DYNAMIC_BUCKET }}"
+        working-directory: ./infra
+
       - name: Destroy All Infrastructure Resources
         if: github.event_name == 'workflow_dispatch'
         run: |

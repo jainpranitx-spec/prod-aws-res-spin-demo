@@ -2,7 +2,6 @@ terraform {
   required_version = ">= 1.0.0"
 
   backend "s3" {
-    bucket = "prod-aws-tf-state-save"
     key    = "state/terraform.tfstate"
     region = "ap-southeast-2"
   }
